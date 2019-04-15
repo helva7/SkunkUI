@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Location;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\Internal\Hydration\AbstractHydrator, PDO;
 
 /**
  * @method Location|null find($id, $lockMode = null, $lockVersion = null)
@@ -47,4 +48,26 @@ class LocationRepository extends ServiceEntityRepository
         ;
     }
     */
+	
+	public function findLastKnownLocation(): array
+	{
+		$entityManager = $this->getEntityManager();
+		
+		$conn = $this->getEntityManager()->getConnection();
+
+		$sql = '
+			SELECT Latitude, Longitude
+			FROM Location
+			WHERE Latitude !=0.00 & Longitude !=0.00
+			ORDER BY id DESC
+			LIMIT 1
+			';
+		$stmt = $conn->prepare($sql);
+		$stmt->execute();
+
+		// returns an array of arrays (i.e. a raw data set)
+		return $stmt->fetchAll();
+	
+	}
+	
 }
