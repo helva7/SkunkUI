@@ -86,8 +86,85 @@
 	
 		<h2>GEO</h2>
 		
-		<p>I have an id of "two" on my page container. I'm the second page container in this multi-page template.</p>
-		<p>Notice that the theme is different for this page because we've added a few <code>data-theme</code> swatch assigments here to show off how flexible it is. You can add any content or widget to these pages, but we're keeping these simple.</p>
+		<div id=locationLL> </div>
+		
+
+		<div id="fenceMap" style="width:100%;height:600px;"></div>
+
+		<script type="text/javascript">
+			
+			var map;
+			
+			var center;
+			
+			var currentInfoWindow;
+			
+			function dogMap() {
+				
+                // center in South Dublin
+				var dublinSouth = new google.maps.LatLng( 53.1002,-6.2106 );
+				
+				//initial properties
+				var mapProperties= {
+				  center: dublinSouth,
+				  zoom: 10,
+				  mapTypeId: google.maps.MapTypeId.ROADMAP
+				};
+				
+				// actual map with initial properties
+				map = new google.maps.Map(document.getElementById("fenceMap"),mapProperties);
+				
+				
+				
+			/*	//marker
+				var dogMarker = new google.maps.Marker({
+					// current dog position
+					position: new google.maps.LatLng( 53.279194, -6.2133575 ),
+				});
+				dogMarker.setMap(map);
+				// Zoom to 9 when clicking on dog marker
+				google.maps.event.addListener(dogMarker,'click',function() {
+					var position = map.getZoom();
+					map.setZoom(15);
+					map.setCenter(dogMarker.getPosition());
+					window.setTimeout(function() {
+						map.setZoom(position);}, 5000);
+				}); */
+				
+				
+				
+			}
+			
+			function addMarker(latitude, longitude) {
+			
+                        var position = new google.maps.LatLng(latitude, longitude);
+						
+						var bounds = new google.maps.LatLngBounds();
+						
+						//initial properties
+						var mapProperties= {
+						  mapTypeId: google.maps.MapTypeId.ROADMAP
+						};
+						
+						//map = new google.maps.Map(document.getElementById("trackingMap"), mapProperties);
+						//https://developers.google.com/maps/documentation/javascript/markers
+                        var dogMarker = new google.maps.Marker({
+                            position: position,
+							zoom: -5,
+                            map: map,
+							label: 'S'
+                        });
+						
+						
+                        bounds.extend(dogMarker.getPosition());
+						map.fitBounds(bounds);
+						
+						map.setZoom(14);
+                        
+            }
+			
+
+		</script>
 		
 		<p><a href="#welcome" data-direction="reverse" class="ui-btn ui-shadow ui-corner-all ui-btn-b">Back to page "one"</a></p>
 
@@ -219,7 +296,7 @@
 
 		</script>
 
-		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGV78b4i0V1nzLj4lmp7kZB3fRjUusrZo&callback=dogMap"></script>
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=XXXXXXXX&callback=dogMap"></script>
 		
 		<p><a href="#welcome" data-direction="reverse" class="ui-btn ui-shadow ui-corner-all ui-btn-b">Back to page "one"</a></p>
 
