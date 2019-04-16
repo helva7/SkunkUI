@@ -58,7 +58,7 @@
 
 		<h3>Please choose one of the following actions:</h3>
 		
-		<p><a href="#geo" class="ui-btn ui-shadow ui-corner-all">Set safe point</a></p>
+		<p><a href="#map" class="ui-btn ui-shadow ui-corner-all">Set safe point</a></p>
 		
 		<p><a href="#map" class="ui-btn ui-shadow ui-corner-all">View live location</a></p>
 
@@ -74,113 +74,8 @@
 
 
 
-<!-- Start of SECOND PAGE: #geo -->
 
-<div data-role="page" id="geo" data-theme="a">
-
-	<div data-role="header">
-		<h1>GEO</h1>
-	</div><!-- /header -->
-
-	<div role="main" class="ui-content">
-	
-		<h2>GEO</h2>
-		
-		<div id=locationLL> </div>
-		
-
-		<div id="fenceMap" style="width:100%;height:600px;"></div>
-
-		<script type="text/javascript">
-			
-			var map;
-			
-			var center;
-			
-			var currentInfoWindow;
-			
-			function dogMap() {
-				
-                // center in South Dublin
-				var dublinSouth = new google.maps.LatLng( 53.1002,-6.2106 );
-				
-				//initial properties
-				var mapProperties= {
-				  center: dublinSouth,
-				  zoom: 10,
-				  mapTypeId: google.maps.MapTypeId.ROADMAP
-				};
-				
-				// actual map with initial properties
-				map = new google.maps.Map(document.getElementById("fenceMap"),mapProperties);
-				
-				
-				
-			/*	//marker
-				var dogMarker = new google.maps.Marker({
-					// current dog position
-					position: new google.maps.LatLng( 53.279194, -6.2133575 ),
-				});
-				dogMarker.setMap(map);
-				// Zoom to 9 when clicking on dog marker
-				google.maps.event.addListener(dogMarker,'click',function() {
-					var position = map.getZoom();
-					map.setZoom(15);
-					map.setCenter(dogMarker.getPosition());
-					window.setTimeout(function() {
-						map.setZoom(position);}, 5000);
-				}); */
-				
-				
-				
-			}
-			
-			function addMarker(latitude, longitude) {
-			
-                        var position = new google.maps.LatLng(latitude, longitude);
-						
-						var bounds = new google.maps.LatLngBounds();
-						
-						//initial properties
-						var mapProperties= {
-						  mapTypeId: google.maps.MapTypeId.ROADMAP
-						};
-						
-						//map = new google.maps.Map(document.getElementById("trackingMap"), mapProperties);
-						//https://developers.google.com/maps/documentation/javascript/markers
-                        var dogMarker = new google.maps.Marker({
-                            position: position,
-							zoom: -5,
-                            map: map,
-							label: 'S'
-                        });
-						
-						
-                        bounds.extend(dogMarker.getPosition());
-						map.fitBounds(bounds);
-						
-						map.setZoom(14);
-                        
-            }
-			
-
-		</script>
-		
-		<p><a href="#welcome" data-direction="reverse" class="ui-btn ui-shadow ui-corner-all ui-btn-b">Back to page "one"</a></p>
-
-	</div><!-- /content -->
-
-	<div data-role="footer">
-		<h4>Page Footer</h4>
-	</div><!-- /footer -->
-	
-</div><!-- /page geo -->
-
-<!-- END OF SECOND PAGE: #geo -->
-
-
-
-<!-- Start of THIRD PAGE: #map -->
+<!-- Start of SECOND PAGE: #map -->
 
 <div data-role="page" id="map" data-theme="a">
 
@@ -192,11 +87,47 @@
 	
 		<h2>MAP</h2>
 		
+		<div id="fence">
+		
+			<div class="ui-grid-c" data-type="horizontal">
+				
+				<div class="ui-block-a"><button id="fenceMarker" >Choose safe location</button></div>
+				
+				<div class="ui-block-b"><button id="removeFenceMarker">Remove safe location</button></div>
+				
+				<div class="ui-block-c"></div>
+				
+				<div class="ui-block-d"><button id="removeFenceMarker">Set safe location</button></div>
+				
+			</div>		
+		
+		</div>
+		
 		<div id=locationLL> </div>
 		
 		<script>
+		//load marker initially
 		
-		window.setInterval('getMarker()', 3000); 	// Call a function every 3000 milliseconds (OR 3 seconds).
+		$.post( "/location" )
+			.done(function( data ) {
+				var string = data;
+				var result = string.split(";");
+					
+				var latitude = result[1];
+				var longitude = result[3];
+					
+				addMarker(latitude, longitude);
+					
+				console.log(result[1]);
+				console.log(result[3]);
+			});
+			
+		</script>
+		
+	<!--	//update marker every 5 sec
+		<script>
+		
+		window.setInterval('getMarker()', 5000); 	// Call a function every 5000 milliseconds (OR 5 seconds).
 		
 		function getMarker() {
 			//updating the marker at loading
@@ -216,19 +147,17 @@
 				
 				}); 	
 		}
-		</script>
-		
+		</script> -->
 
 		<div id="trackingMap" style="width:100%;height:600px;"></div>
 
 		<script type="text/javascript">
 			
-			var map;
+			$('#removeFenceMarker').hide();
 			
-			var center;
+			var map, center, radius;
 			
-			var currentInfoWindow;
-			
+			//initialize the map
 			function dogMap() {
 				
                 // center in South Dublin
@@ -244,59 +173,142 @@
 				// actual map with initial properties
 				map = new google.maps.Map(document.getElementById("trackingMap"),mapProperties);
 				
+			
+				var myDrawingManager = new google.maps.drawing.DrawingManager(); 
 				
 				
-			/*	//marker
-				var dogMarker = new google.maps.Marker({
-					// current dog position
-					position: new google.maps.LatLng( 53.279194, -6.2133575 ),
+				google.maps.event.addListener(myDrawingManager, 'circlecomplete', function(circle) {
+					
+					//make circle area uneditable to get correct radius
+					myCircle = circle;
+					myCircle.setOptions({ editable: false });
+					
+					//make circle uneditable
+					//myDrawingManager.setDrawingMode(null);
+					
+					//remove drawing controls
+					myDrawingManager.setMap(null);
+					
+					//getting central coordinates for safe area
+					center = circle.getCenter();
+					console.log(center);
+					
+					coordinates = circle.getCenter();
+					console.log(center);
+					
+					// getting radius of the safe zone
+					radius = circle.getRadius();
+					console.log(radius);
 				});
-				dogMarker.setMap(map);
-				// Zoom to 9 when clicking on dog marker
+					
+			
+				//HTML5 geolocation
+				navigator.geolocation.getCurrentPosition(function(position) {		
+					var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+					console.log(pos);
+				});
+				
+			
+			
+				$('#fenceMarker').click(function() {
+				
+					$('#fenceMarker').hide();
+					$('#removeFenceMarker').show();
+
+					myDrawingManager.setOptions({
+					
+						drawingControlOptions: {
+							position: google.maps.ControlPosition.TOP_CENTER,
+							drawingModes: ['circle']
+						},
+						
+						drawingControl: true,
+						
+						circleOptions: {
+						  fillColor: '#00b300',
+						  fillOpacity: 0.3,
+						  strokeWeight: 2,
+						  clickable: false,
+						  editable: true,
+						  zIndex: 1,
+						  //label: {
+							//text:'Safe',
+							//fontSize: "15px",
+							//fontWeight: "bold"
+							//}
+						}
+					});
+					
+					myDrawingManager.setMap(map); 
+					
+				});
+			
+				$('#removeFenceMarker').click(function() {
+				
+					$('#fenceMarker').show();
+					$('#removeFenceMarker').hide();
+					
+					myDrawingManager.setDrawingMode(null);
+					myDrawingManager.setMap(null);
+					myCircle.setMap(null);
+				});
+			
+			}
+			
+			
+			function addMarker(latitude, longitude) {
+			
+                var position = new google.maps.LatLng(latitude, longitude);
+						
+				var bounds = new google.maps.LatLngBounds();
+						
+				//initial properties
+				var mapProperties= {
+					mapTypeId: google.maps.MapTypeId.ROADMAP
+				};
+						
+				//map = new google.maps.Map(document.getElementById("trackingMap"), mapProperties);
+				//https://developers.google.com/maps/documentation/javascript/markers
+                var dogMarker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+					label: {
+						text:'Woof!',
+						fontSize: "15px",
+						fontWeight: "bold"
+					}
+                });
+						
+                bounds.extend(dogMarker.getPosition());
+				map.fitBounds(bounds);
+						
+				map.setZoom(14);
+						
+				/*	// Zoom to 9 when clicking on dog marker
 				google.maps.event.addListener(dogMarker,'click',function() {
 					var position = map.getZoom();
 					map.setZoom(15);
 					map.setCenter(dogMarker.getPosition());
 					window.setTimeout(function() {
-						map.setZoom(position);}, 5000);
-				}); */
-				
-				
-				
-			}
-			
-			function addMarker(latitude, longitude) {
-			
-                        var position = new google.maps.LatLng(latitude, longitude);
-						
-						var bounds = new google.maps.LatLngBounds();
-						
-						//initial properties
-						var mapProperties= {
-						  mapTypeId: google.maps.MapTypeId.ROADMAP
-						};
-						
-						//map = new google.maps.Map(document.getElementById("trackingMap"), mapProperties);
-						//https://developers.google.com/maps/documentation/javascript/markers
-                        var dogMarker = new google.maps.Marker({
-                            position: position,
-							zoom: -5,
-                            map: map,
-							label: 'S'
-                        });
-						
-						
-                        bounds.extend(dogMarker.getPosition());
-						map.fitBounds(bounds);
-						
-						map.setZoom(14);
-                        
+					map.setZoom(position);}, 5000);
+				}); */  
             }
 			
+			
+				// check if Geolocation is supported
+			if (navigator.geolocation) {
+			  console.log('Geolocation is supported!');
+			}
+			else {
+			  console.log('Geolocation is not supported for this Browser/OS.');
+			}
+		
+
+		
 
 		</script>
 
-		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=XXX&callback=dogMap"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=XXXXXX&libraries=drawing,geometry&callback=dogMap" async defer></script>
 		
 		<p><a href="#welcome" data-direction="reverse" class="ui-btn ui-shadow ui-corner-all ui-btn-b">Back to page "one"</a></p>
 
@@ -310,33 +322,6 @@
 
 <!-- END OF SECOND PAGE: #map -->
 
-
-
-
-
-
-<!-- Start of SECOND PAGE: #two -->
-
-<div data-role="page" id="two" data-theme="a">
-
-	<div data-role="header">
-		<h1>Two</h1>
-	</div><!-- /header -->
-
-	<div role="main" class="ui-content">
-		<h2>Two</h2>
-		<p>I have an id of "two" on my page container. I'm the second page container in this multi-page template.</p>
-		<p>Notice that the theme is different for this page because we've added a few <code>data-theme</code> swatch assigments here to show off how flexible it is. You can add any content or widget to these pages, but we're keeping these simple.</p>
-		<p><a href="#one" data-direction="reverse" class="ui-btn ui-shadow ui-corner-all ui-btn-b">Back to page "one"</a></p>
-
-	</div><!-- /content -->
-
-	<div data-role="footer">
-		<h4>Page Footer</h4>
-	</div><!-- /footer -->
-</div><!-- /page two -->
-
-<!-- END OF SECOND PAGE: #two -->
 
 
 
