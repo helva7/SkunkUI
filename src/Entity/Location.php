@@ -22,12 +22,12 @@ class Location
     private $dog_name;
 
     /**
-     * @ORM\Column(type="decimal", precision=10, scale=8, nullable=true)
+     * @ORM\Column(type="decimal", precision=12, scale=10, nullable=true)
      */
     private $latitude;
 
     /**
-     * @ORM\Column(type="decimal", precision=10, scale=8, nullable=true)
+     * @ORM\Column(type="decimal", precision=12, scale=10, nullable=true)
      */
     private $longitude;
 

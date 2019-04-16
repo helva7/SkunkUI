@@ -97,7 +97,7 @@
 				
 				<div class="ui-block-c"></div>
 				
-				<div class="ui-block-d"><button id="removeFenceMarker">Set safe location</button></div>
+				<div class="ui-block-d"><button id="sendSafeLocation">Set safe location</button></div>
 				
 			</div>		
 		
@@ -155,7 +155,7 @@
 			
 			$('#removeFenceMarker').hide();
 			
-			var map, center, radius;
+			var map, center, radius, lat, lng;
 			
 			//initialize the map
 			function dogMap() {
@@ -189,12 +189,15 @@
 					//remove drawing controls
 					myDrawingManager.setMap(null);
 					
-					//getting central coordinates for safe area
+					//getting central coordinates for safe area, an object
 					center = circle.getCenter();
 					console.log(center);
 					
-					coordinates = circle.getCenter();
-					console.log(center);
+					//lat = center.lat();
+					//console.log(lat);
+					
+					//lng = center.lng();
+					//console.log(lng);
 					
 					// getting radius of the safe zone
 					radius = circle.getRadius();
@@ -253,6 +256,19 @@
 					myCircle.setMap(null);
 				});
 			
+				$('#sendSafeLocation').click(function() {
+					
+					lat = center.lat();
+					console.log(lat);
+					
+					lng = center.lng();
+					console.log(lng);
+					
+					$.post( "/geofence", { lat:lat, lng:lng}).done(function( data ) {
+						alert( "Data Loaded: " + data );
+					});
+				});
+			
 			}
 			
 			
@@ -308,7 +324,7 @@
 
 		</script>
 
-		<script src="https://maps.googleapis.com/maps/api/js?key=XXXXXX&libraries=drawing,geometry&callback=dogMap" async defer></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=&libraries=drawing,geometry&callback=dogMap" async defer></script>
 		
 		<p><a href="#welcome" data-direction="reverse" class="ui-btn ui-shadow ui-corner-all ui-btn-b">Back to page "one"</a></p>
 
