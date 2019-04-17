@@ -4,8 +4,49 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b842830ee89fedfd30fef7ec70e538c8",
+    "content-hash": "48687c60101fe1c65bf193ede07b2db9",
     "packages": [
+        {
+            "name": "bentools/helpfultraits",
+            "version": "v1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bpolaszek/helpfultraits.git",
+                "reference": "43c210c917f26e8557c1b4b38101a1542a2ca511"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bpolaszek/helpfultraits/zipball/43c210c917f26e8557c1b4b38101a1542a2ca511",
+                "reference": "43c210c917f26e8557c1b4b38101a1542a2ca511",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "doctrine/orm": "^2.5",
+                "symfony/symfony": "^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "BenTools\\HelpfulTraits\\Symfony\\": "src/BenTools/HelpfulTraits/Symfony"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Beno!t POLASZEK",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Some nice traits to use with Symfony.",
+            "homepage": "https://github.com/bpolaszek/bentools-helpfultraits",
+            "time": "2017-12-14T11:05:08+00:00"
+        },
         {
             "name": "doctrine/annotations",
             "version": "v1.6.1",

@@ -17,14 +17,19 @@ class Geofence
     private $id;
 
     /**
-     * @ORM\Column(type="decimal", precision=12, scale=10, nullable=true)
+     * @ORM\Column(type="decimal", precision=11, scale=8, nullable=true)
      */
     private $lat;
 
     /**
-     * @ORM\Column(type="decimal", precision=12, scale=10, nullable=true)
+     * @ORM\Column(type="decimal", precision=11, scale=8, nullable=true)
      */
     private $lng;
+
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=3, nullable=true)
+     */
+    private $radius;
 
     public function getId(): ?int
     {
@@ -51,6 +56,18 @@ class Geofence
     public function setLng($lng): self
     {
         $this->lng = $lng;
+
+        return $this;
+    }
+
+    public function getRadius()
+    {
+        return $this->radius;
+    }
+
+    public function setRadius($radius): self
+    {
+        $this->radius = $radius;
 
         return $this;
     }

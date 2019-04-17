@@ -80,24 +80,26 @@
 <div data-role="page" id="map" data-theme="a">
 
 	<div data-role="header">
-		<h1>MAP</h1>
+		<h2>MAP</h2>
 	</div><!-- /header -->
 
 	<div role="main" class="ui-content">
-	
-		<h2>MAP</h2>
+		
+		<div id="fence_exists" style="text-align: center"> </div>
 		
 		<div id="fence">
 		
-			<div class="ui-grid-c" data-type="horizontal">
+			<div class="ui-grid-d" data-type="horizontal">
 				
 				<div class="ui-block-a"><button id="fenceMarker" >Choose safe location</button></div>
 				
-				<div class="ui-block-b"><button id="removeFenceMarker">Remove safe location</button></div>
+				<div class="ui-block-b"><button id="editFenceMarker">Edit safe location</button></div>
 				
 				<div class="ui-block-c"></div>
 				
-				<div class="ui-block-d"><button id="sendSafeLocation">Set safe location</button></div>
+				<div class="ui-block-d"><button id="removeFence">Remove geofence</button></div>
+				
+				<div class="ui-block-e"><button id="sendSafeLocation">Set geofence</button></div>
 				
 			</div>		
 		
@@ -120,6 +122,46 @@
 					
 				console.log(result[1]);
 				console.log(result[3]);
+			});
+			
+		</script>
+		
+		<script>
+		//load fence if set initially
+		
+		$.post( "/fence" )
+			.done(function( data ) {
+				
+				if ( data == 1) {
+			
+					//do nothing
+					$('#fenceMarker').show();
+					$('#editFenceMarker').hide();
+					$('#removeFence').hide();
+					$('#sendSafeLocation').hide();
+					
+				} else {
+					
+					$('#fenceMarker').hide();
+					$('#editFenceMarker').hide();
+					$('#removeFence').show();
+					$('#sendSafeLocation').hide();
+				
+					var string2 = data;
+					var result2 = string2.split(";");
+						
+					var lat = parseFloat(result2[1]);
+					var lng = parseFloat(result2[3]);
+					var radius = parseFloat(result2[5]);
+						
+					addExistingFence(lat, lng, radius);
+						
+					console.log(result2[1]);
+					console.log(result2[3]);
+					console.log(result2[5]);
+					
+					$("#fence_exists").html("******* Geo fence is active ******	 Lat: " + lat + "; Lng: " + lng + "; Radius: " + radius).css('font-weight', 'bold');
+				} 
 			});
 			
 		</script>
@@ -153,9 +195,7 @@
 
 		<script type="text/javascript">
 			
-			$('#removeFenceMarker').hide();
-			
-			var map, center, radius, lat, lng;
+			var map, center, radius, lat, lng, myCircle;
 			
 			//initialize the map
 			function dogMap() {
@@ -173,6 +213,7 @@
 				// actual map with initial properties
 				map = new google.maps.Map(document.getElementById("trackingMap"),mapProperties);
 				
+				$('#editFenceMarker').hide();
 			
 				var myDrawingManager = new google.maps.drawing.DrawingManager(); 
 				
@@ -183,25 +224,16 @@
 					myCircle = circle;
 					myCircle.setOptions({ editable: false });
 					
-					//make circle uneditable
-					//myDrawingManager.setDrawingMode(null);
-					
 					//remove drawing controls
 					myDrawingManager.setMap(null);
 					
 					//getting central coordinates for safe area, an object
-					center = circle.getCenter();
-					console.log(center);
-					
-					//lat = center.lat();
-					//console.log(lat);
-					
-					//lng = center.lng();
-					//console.log(lng);
+					center = myCircle.getCenter();
+					//console.log(center);
 					
 					// getting radius of the safe zone
-					radius = circle.getRadius();
-					console.log(radius);
+					//radius = circle.getRadius();
+					//console.log(radius);
 				});
 					
 			
@@ -216,7 +248,8 @@
 				$('#fenceMarker').click(function() {
 				
 					$('#fenceMarker').hide();
-					$('#removeFenceMarker').show();
+					$('#editFenceMarker').show();
+					$('#sendSafeLocation').show();
 
 					myDrawingManager.setOptions({
 					
@@ -246,28 +279,57 @@
 					
 				});
 			
-				$('#removeFenceMarker').click(function() {
+				$('#editFenceMarker').click(function() {
 				
 					$('#fenceMarker').show();
-					$('#removeFenceMarker').hide();
+					$('#editFenceMarker').hide();
 					
 					myDrawingManager.setDrawingMode(null);
 					myDrawingManager.setMap(null);
 					myCircle.setMap(null);
 				});
-			
+
+				$('#removeFence').click(function() {
+					
+					$.post( "/deleteFence")
+						.done(function( data ) {
+							//alert( data ); //not needed due 
+					});
+					
+					//remove a circle from a map -->refresh page
+					window.location.reload();
+					
+					
+				});
+				
 				$('#sendSafeLocation').click(function() {
 					
-					lat = center.lat();
-					console.log(lat);
+					if ( !myCircle ) {
 					
-					lng = center.lng();
-					console.log(lng);
+						alert('Geo fence is not set. Choose safe location first.');
+						
+					} else {
 					
-					$.post( "/geofence", { lat:lat, lng:lng}).done(function( data ) {
-						alert( "Data Loaded: " + data );
-					});
+						lat = center.lat();
+						console.log(lat);
+						
+						lng = center.lng();
+						console.log(lng);
+						
+						//here mysql has some issues, had to play with precision.
+						radius = myCircle.getRadius();
+						console.log("radius is "+radius);
+						
+						$.post( "/geofence", { lat: lat, lng: lng, radius: radius})
+							.done(function( data ) {
+								//alert( data ); //not needed due to refresh
+						});
+					}
+					
+					//show geo fence details -->refresh page
+					window.location.reload();
 				});
+				
 			
 			}
 			
@@ -311,20 +373,36 @@
             }
 			
 			
-				// check if Geolocation is supported
+			function addExistingFence(latitude, longitude, radius) {
+				
+				// Add circle overlay and bind to marker
+				var fence = new google.maps.Circle({
+					center: new google.maps.LatLng(latitude, longitude),
+				  map: map,
+				  radius: radius, 
+				  fillColor: '#00b300',
+					strokeOpacity: 0.3,
+					strokeWeight: 2
+				});
+				
+				//map.fitBounds(fence.getBounds());
+            }
+			
+			
+		/*		// check if Geolocation is supported
 			if (navigator.geolocation) {
 			  console.log('Geolocation is supported!');
 			}
 			else {
 			  console.log('Geolocation is not supported for this Browser/OS.');
-			}
+			} */
 		
 
 		
 
 		</script>
 
-		<script src="https://maps.googleapis.com/maps/api/js?key=&libraries=drawing,geometry&callback=dogMap" async defer></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=XXX&libraries=drawing,geometry&callback=dogMap" async defer></script>
 		
 		<p><a href="#welcome" data-direction="reverse" class="ui-btn ui-shadow ui-corner-all ui-btn-b">Back to page "one"</a></p>
 

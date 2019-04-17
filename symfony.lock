@@ -1,4 +1,7 @@
 {
+    "bentools/helpfultraits": {
+        "version": "v1.0.3"
+    },
     "doctrine/annotations": {
         "version": "1.0",
         "recipe": {

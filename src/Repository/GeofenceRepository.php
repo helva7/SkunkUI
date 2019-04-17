@@ -47,4 +47,29 @@ class GeofenceRepository extends ServiceEntityRepository
         ;
     }
     */
+	
+	
+		public function findFence(): array
+	{
+		$entityManager = $this->getEntityManager();
+		
+		$conn = $this->getEntityManager()->getConnection();
+
+		$sql = '
+			SELECT lat, lng, radius
+			FROM Geofence
+			WHERE lat !=0.00 & lng !=0.00
+			ORDER BY id DESC
+			LIMIT 1
+			';
+		$stmt = $conn->prepare($sql);
+		$stmt->execute();
+
+		// returns an array of arrays (i.e. a raw data set)
+		return $stmt->fetchAll();
+	
+	}
+	
+	
+	
 }
