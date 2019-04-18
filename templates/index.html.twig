@@ -24,6 +24,12 @@
     padding-top:.22em;
     padding-bottom:.22em;
 	}
+	
+	.ui-grid-d .ui-btn {
+		text-align: center;
+		white-space: normal;
+	}
+		
 	</style>
 	
 	<style>
@@ -51,10 +57,9 @@
 	<div role="main" class="ui-content">
 	
 		<h2>Where is my Charlie?</h2>
-
-		<br>
 		
         <p>Welcome to the application!</p>
+		
 
 		<h3>Please choose one of the following actions:</h3>
 		
@@ -91,15 +96,13 @@
 		
 			<div class="ui-grid-d" data-type="horizontal">
 				
-				<div class="ui-block-a"><button id="fenceMarker" >Choose safe location</button></div>
+				<div class="ui-block-a"><a href="#" class="ui-btn"id="fenceMarker">Choose safe location</a></div>
 				
-				<div class="ui-block-b"><button id="editFenceMarker">Edit safe location</button></div>
+				<div class="ui-block-b"><a href="#" class="ui-btn" id="editFenceMarker">Edit safe location</a></div>
 				
-				<div class="ui-block-c"></div>
+				<div class="ui-block-c"><a href="#" class="ui-btn" id="removeFence">Remove geofence</a></div>
 				
-				<div class="ui-block-d"><button id="removeFence">Remove geofence</button></div>
-				
-				<div class="ui-block-e"><button id="sendSafeLocation">Set geofence</button></div>
+				<div class="ui-block-d"><a href="#" class="ui-btn" id="sendSafeLocation">Set geofence</a></div>
 				
 			</div>		
 		
@@ -402,7 +405,7 @@
 
 		</script>
 
-		<script src="https://maps.googleapis.com/maps/api/js?key=XXX&libraries=drawing,geometry&callback=dogMap" async defer></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBryEw1_VF5B6StRitSZQWqFUjmA2tzbUQ&libraries=drawing,geometry&callback=dogMap" async defer></script>
 		
 		<p><a href="#welcome" data-direction="reverse" class="ui-btn ui-shadow ui-corner-all ui-btn-b">Back to page "one"</a></p>
 
