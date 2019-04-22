@@ -36,6 +36,11 @@ class Location
      */
     private $speed;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $datetime;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -85,6 +90,18 @@ class Location
     public function setSpeed(?int $speed): self
     {
         $this->speed = $speed;
+
+        return $this;
+    }
+
+    public function getDatetime(): ?string
+    {
+        return $this->datetime;
+    }
+
+    public function setDatetime(?string $datetime): self
+    {
+        $this->datetime = $datetime;
 
         return $this;
     }

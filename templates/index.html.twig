@@ -115,16 +115,19 @@
 		
 		$.post( "/location" )
 			.done(function( data ) {
+				
 				var string = data;
 				var result = string.split(";");
 					
 				var latitude = result[1];
 				var longitude = result[3];
+				var datetime = result[5];
 					
-				addMarker(latitude, longitude);
+				addMarker(latitude, longitude, datetime);
 					
 				console.log(result[1]);
 				console.log(result[3]);
+				console.log(result[5]);
 			});
 			
 		</script>
@@ -184,7 +187,7 @@
 					var latitude = result[1];
 					var longitude = result[3];
 					
-					addMarker(latitude, longitude);
+					addMarker(latitude, longitude, datetime);
 					
 					console.log(result[1]);
 					console.log(result[3]);
@@ -337,7 +340,7 @@
 			}
 			
 			
-			function addMarker(latitude, longitude) {
+			function addMarker(latitude, longitude, datetime) {
 			
                 var position = new google.maps.LatLng(latitude, longitude);
 						
@@ -373,6 +376,16 @@
 					window.setTimeout(function() {
 					map.setZoom(position);}, 5000);
 				}); */  
+				
+				var content = "<p>" + "I have been here @ " + "<br />"  + "<br />" + "<strong>" + datetime + "<strong/>"+ "</p>";
+				
+				var infoWindow = new google.maps.InfoWindow({
+					content: content
+				});
+				
+				dogMarker.addListener('click', function() {
+					infoWindow.open(map, dogMarker);
+				 });
             }
 			
 			
@@ -405,7 +418,7 @@
 
 		</script>
 
-		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBryEw1_VF5B6StRitSZQWqFUjmA2tzbUQ&libraries=drawing,geometry&callback=dogMap" async defer></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhAK61UUYI-RNA8IX7QjH8bxTdZ6nONB8&libraries=drawing,geometry&callback=dogMap" async defer></script>
 		
 		<p><a href="#welcome" data-direction="reverse" class="ui-btn ui-shadow ui-corner-all ui-btn-b">Back to page "one"</a></p>
 

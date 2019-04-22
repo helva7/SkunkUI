@@ -56,7 +56,7 @@ class LocationRepository extends ServiceEntityRepository
 		$conn = $this->getEntityManager()->getConnection();
 
 		$sql = '
-			SELECT Latitude, Longitude
+			SELECT Latitude, Longitude, Datetime
 			FROM Location
 			WHERE Latitude !=0.00 & Longitude !=0.00
 			ORDER BY id DESC

@@ -47,15 +47,34 @@ else
   echo "<br>";
 }
 
+if (isset ($_POST['datetime'])){
+	$datetime = $_POST["datetime"];
+}
+else 
+{
+  $datetime = null;
+  echo "didn't get datetime";
+  echo "<br>";
+}
+
+if (isset ($_POST['speed'])){
+	$speed = $_POST["speed"];
+}
+else 
+{
+  $speed = null;
+  echo "didn't get speed";
+  echo "<br>";
+}
 //$longitude = $_POST['longitude'];
 //$speed =  $_POST['speed'];
 
 
-$sql = "INSERT INTO location (latitude, longitude) VALUES (?,?)";
+$sql = "INSERT INTO location (latitude, longitude, datetime, speed) VALUES (?,?,?,?)";
 
 $stmt= $pdo->prepare($sql);
 
-$stmt->execute([$latitude, $longitude]); 
+$stmt->execute([$latitude, $longitude, $datetime, $speed]); 
 
 
 
